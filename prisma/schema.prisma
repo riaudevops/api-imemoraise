@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model akun {
+  email      String      @id(map: "pk_email_akun") @db.VarChar(255)
+  nama       String      @db.VarChar(255)
+  created_at DateTime    @default(now()) @db.Timestamp(6)
+  updated_at DateTime    @default(now()) @db.Timestamp(6)
+  dosen      dosen[]
+  mahasiswa  mahasiswa[]
+}
+
+model dosen {
+  nip       String      @id(map: "pk_nip_dosen") @db.VarChar(18)
+  nama      String      @db.VarChar(255)
+  email     String      @db.VarChar(255)
+  akun      akun        @relation(fields: [email], references: [email], onDelete: NoAction, onUpdate: NoAction, map: "fk_email_dosen")
+  mahasiswa mahasiswa[]
+  setoran   setoran[]
+}
+
+model mahasiswa {
+  nim     String    @id(map: "pk_nim_mahasiswa") @db.VarChar(11)
+  nama    String    @db.VarChar(255)
+  email   String    @db.VarChar(255)
+  nip     String    @db.VarChar(18)
+  akun    akun      @relation(fields: [email], references: [email], onDelete: NoAction, onUpdate: NoAction, map: "fk_email_mahasiswa")
+  dosen   dosen     @relation(fields: [nip], references: [nip], onDelete: NoAction, onUpdate: NoAction, map: "fk_nip_mahasiswa")
+  setoran setoran[]
+}
+
+model setoran {
+  id           String    @id(map: "pk_id_setoran") @db.VarChar(8)
+  tgl_setoran  DateTime  @default(now()) @db.Date
+  tgl_validasi DateTime  @default(now()) @db.Date
+  nim          String    @db.VarChar(11)
+  nip          String    @db.VarChar(18)
+  nomor_surah  Int
+  mahasiswa    mahasiswa @relation(fields: [nim], references: [nim], onDelete: NoAction, onUpdate: NoAction, map: "fk_nim_setoran")
+  dosen        dosen     @relation(fields: [nip], references: [nip], onDelete: NoAction, onUpdate: NoAction, map: "fk_nip_setoran")
+  surah        surah     @relation(fields: [nomor_surah], references: [nomor], onDelete: NoAction, onUpdate: NoAction, map: "fk_nomor_surah_setoran")
+}
+
+model surah {
+  nomor   Int               @id(map: "pk_nomor_surah")
+  nama    String            @db.VarChar(25)
+  label   type_label_surah?
+  setoran setoran[]
+}
+
+enum type_label_surah {
+  KP
+  SEMKP
+  DAFTAR_TA
+  SEMPRO
+  SIDANG_TA
+}

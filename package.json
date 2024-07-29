@@ -1,0 +1,20 @@
+{
+  "name": "api-imemoraise",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "@types/express": "^4.17.21"
+  },
+  "scripts": {
+    "start": "bun --hot run index.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.17.0",
+    "express": "^4.19.2",
+    "prisma": "^5.17.0"
+  }
+}
