@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction, response } from "express";
+import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 const accessTokenValidation = (req: Request, res: Response, next: NextFunction) => {
@@ -12,14 +12,10 @@ const accessTokenValidation = (req: Request, res: Response, next: NextFunction) 
     });
   }
 
-  console.log("Received token:", token);
-
   const publicKey =
     "-----BEGIN PUBLIC KEY-----\n" +
     process.env.PUBLIC_KEY +
     "\n-----END PUBLIC KEY-----";
-
-  console.log("Using public key:", publicKey);
 
   jwt.verify(token, publicKey, { algorithms: ["RS256"] }, (err, decoded) => {
     if (err) {
