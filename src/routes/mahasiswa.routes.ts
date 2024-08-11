@@ -1,6 +1,6 @@
 import express from "express";
-import { getStat, getFormSurah } from "../controllers/mahasiswa.controllers";
 import accessTokenValidation from "../middlewares/auth.middlewares";
+import { getStat, getFormSurah } from "../controllers/mahasiswa.controllers";
 
 const router = express.Router();
 
