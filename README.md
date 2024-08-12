@@ -1,5 +1,5 @@
 <div align="center" style="margin-bottom: 59px;">
-    This repository houses the <b>frontend code</b> for iMemoraise, the Integrated Quran Memorization Information System.
+    This repository houses the <b>backend code</b> for iMemoraise, the Integrated Quran Memorization Information System.
     </br>
     🔥 Designed to streamline the recitation submission process, particularly for UIN Suska Riau. 🔥
 </div>
