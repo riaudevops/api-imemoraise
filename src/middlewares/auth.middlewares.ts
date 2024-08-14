@@ -1,14 +1,23 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 
-const accessTokenValidation = (req: Request, res: Response, next: NextFunction) => {
-    const { authorization } = req.headers;
-    const token = authorization && authorization.split(' ')[1];
+// Extend Request type to include 'role'
+interface CustomRequest extends Request {
+  roles?: string[];
+}
+
+const accessTokenValidation = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { authorization } = req.headers;
+  const token = authorization && authorization.split(" ")[1];
 
   if (!token) {
-    return res.status(401).json({ 
-        response: false,
-        message: "Token is required" 
+    return res.status(401).json({
+      response: false,
+      message: "Token is required",
     });
   }
 
@@ -23,7 +32,13 @@ const accessTokenValidation = (req: Request, res: Response, next: NextFunction) 
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    console.log("Decoded token:", decoded);
+    // Type assertion to make sure 'decoded' is treated as JwtPayload
+    const jwtPayload = decoded as JwtPayload;
+
+    // Extract roles from the decoded token
+    const roles = jwtPayload.resource_access?.iMemoraise?.roles;
+
+    (req as CustomRequest).roles = roles;
     next();
   });
 };

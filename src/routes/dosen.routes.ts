@@ -1,11 +1,12 @@
 import express from "express";
 import accessTokenValidation from "../middlewares/auth.middlewares";
-import { getAllMahasiswaPA, getMahasiswaPAByNIM } from "../controllers/dosen.controllers";
+import { getAllMahasiswaPAByAngkatan, getInfoMahasiswaPAPerAngkatanByNIP } from "../controllers/dosen.controllers";
+import { dosenPaOnly } from "../middlewares/protected.middlewares";
 
 const router = express.Router();
 
-router.get("/mahasiswa-pa", accessTokenValidation, getAllMahasiswaPA);
-router.get("/mahasiswa-pa/:nim", accessTokenValidation, getMahasiswaPAByNIM);
+router.get("/dosen/mahasiswa/angkatan/info/:nip", accessTokenValidation, dosenPaOnly, getInfoMahasiswaPAPerAngkatanByNIP);
+router.get("/dosen/mahasiswa", accessTokenValidation, dosenPaOnly, getAllMahasiswaPAByAngkatan);
 
 export default router;
 
