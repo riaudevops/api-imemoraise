@@ -1,10 +1,11 @@
 import express from "express";
 import accessTokenValidation from "../middlewares/auth.middlewares";
-import { getStat, getFormSurah } from "../controllers/mahasiswa.controllers";
+import { getInfoSetoranMahasiswaByNIM, getSurahMahasiswaByNIM } from "../controllers/mahasiswa.controllers";
+import { mahasiswaOnly } from "../middlewares/protected.middlewares";
 
 const router = express.Router();
 
-router.get("/stat", accessTokenValidation, getStat);
-router.get("/setoran", accessTokenValidation, getFormSurah);
+router.get("/mahasiswa/surah/info/:nim", accessTokenValidation, mahasiswaOnly, getInfoSetoranMahasiswaByNIM);
+router.get("/mahasiswa/surah/:nim", accessTokenValidation, mahasiswaOnly, getSurahMahasiswaByNIM);
 
 export default router;
