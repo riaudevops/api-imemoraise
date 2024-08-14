@@ -1,47 +1,94 @@
 import { PrismaClient } from "@prisma/client";
-import { response } from "express";
+import { IDGenerator } from "../services/dosen.services";
 
 const prisma = new PrismaClient();
 
+const postSetoran = async (req: any, res: any) => {
+  const { nim, nip, nomor_surah } = req.body;
+
+  // Validasi input
+  if (!nim || !nip || !nomor_surah) {
+    return res.status(400).json({
+      response: false,
+      message: "Missing required fields",
+    });
+  }
+
+  // Convert nomor_surah to integer if it is a string
+  const nomorSurahInt = parseInt(nomor_surah as string, 10);
+
+  if (isNaN(nomorSurahInt)) {
+    return res.status(400).json({
+      response: false,
+      message: "Invalid nomor_surah format",
+    });
+  }
+
+  try {
+    // Periksa apakah kombinasi nim, nip, dan nomor_surah sudah ada
+    const existingSetoran = await prisma.setoran.findFirst({
+      where: {
+        AND: [
+          { nim: nim as string },
+          { nip: nip as string },
+          { nomor_surah: nomorSurahInt }
+        ]
+      }
+    });
+
+    if (existingSetoran) {
+      return res.status(409).json({
+        response: false,
+        message: "Combination of nim, nip, and nomor_surah already exists",
+      });
+    }
+
+    // Generate ID baru
+    const idSetoran = await IDGenerator.generateNewId();
+
+    // Simpan data ke database
+    const result = await prisma.setoran.create({
+      data: {
+        id: idSetoran,
+        tgl_setoran: new Date(),
+        tgl_validasi: new Date(),
+        nim: nim as string,
+        nip: nip as string,
+        nomor_surah: nomorSurahInt,
+      },
+    });
+
+    // Kirim respons sukses
+    res.status(201).json({
+      response: true,
+      message: "Data terkirim",
+      data: result,
+    });
+  } catch (error) {
+    // Tangani kesalahan
+    console.error("Error executing query:", error);
+    res.status(500).json({
+      response: false,
+      message: "Error posting data",
+      error: 'test', // Hanya kirim pesan error untuk keamanan
+    });
+  }
+};
+
 const findMahasiswaByNameOrNim = async (req: any, res: any) => {
-  const { nama, nim, nip, angkatan } = req.params;
+  const { search, nip, angkatan } = req.query;
 
   try {
     const result = await prisma.$queryRaw`
     SELECT nim, nama
     FROM mahasiswa WHERE CONCAT('20', SUBSTRING(nim, 2, 2)) = ${angkatan}
     AND nip = ${nip}
-    AND (nama LIKE ${`%${nama}%`} OR nim LIKE ${`%${nim}%`});
+    AND (nama LIKE ${`%${search}%`} OR nim LIKE ${`%${search}%`});
     `;
 
     res.status(200).json({
       response: true,
       message: "Nama atau Nim mahasiswa",
-      data: result,
-    });
-  } catch (error) {
-    console.error("Error executing query:", error);
-    res.status(500).json({
-      response: false,
-      message: "Error retrieving data",
-      error: error,
-    });
-  }
-};
-
-const getAllMahasiswaPAByAngkatan = async (req: any, res: any) => {
-  const { angkatan, nip } = req.params;
-
-  try {
-    const result = await prisma.$queryRaw`
-    SELECT nim, nama, CONCAT('20', SUBSTRING(nim, 2, 2)) AS tahun
-    FROM mahasiswa
-    WHERE CONCAT('20', SUBSTRING(nim, 2, 2)) = ${angkatan} AND nip = ${nip}
-    `;
-
-    res.status(200).json({
-      response: true,
-      message: "Ini adalah list mahasiswa berdasarkan angkatan dan dosen pa",
       data: result,
     });
   } catch (error) {
@@ -99,8 +146,4 @@ const getInfoMahasiswaPAPerAngkatanByNIP = async (req: any, res: any) => {
   });
 };
 
-export {
-  getAllMahasiswaPAByAngkatan,
-  getInfoMahasiswaPAPerAngkatanByNIP,
-  findMahasiswaByNameOrNim,
-};
+export { getInfoMahasiswaPAPerAngkatanByNIP, findMahasiswaByNameOrNim, postSetoran };
