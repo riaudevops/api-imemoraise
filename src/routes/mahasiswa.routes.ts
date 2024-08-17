@@ -5,8 +5,8 @@ import { mahasiswaOnly } from "../middlewares/protected.middlewares";
 
 const router = express.Router();
 
+router.get("/mahasiswa/setoran/info/:nim", accessTokenValidation, mahasiswaOnly, getInfoSetoranMahasiswaByNIM);
 router.get("/mahasiswa/info/:email", accessTokenValidation, mahasiswaOnly, getInfoMahasiswaByEmail);
-router.get("/mahasiswa/surah/info/:nim", accessTokenValidation, mahasiswaOnly, getInfoSetoranMahasiswaByNIM);
 router.get("/mahasiswa/surah/:nim", accessTokenValidation, mahasiswaOnly, getSurahMahasiswaByNIM);
 
 export default router;
