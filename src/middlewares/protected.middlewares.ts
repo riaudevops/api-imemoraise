@@ -5,38 +5,19 @@ interface CustomRequest extends Request {
     roles?: string[];
 }
 
-const mahasiswaOnly = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
+const authorizeRoles = (...roles: string[]) => {
+  return (req: CustomRequest, res: Response, next: NextFunction) => {
+    const userRole =(req as CustomRequest).roles;
+    const hasRole = userRole?.some((role) => roles.includes(role));
 
-    if ((req as CustomRequest).roles?.includes("mahasiswa")) {
-        return next();
-    }  
+    if (!hasRole) {
+      return res.status(403).json({ message: 'Forbidden: Insufficient role' });
+    }
 
-    res.status(401).json({
-      response: false,
-      message: "Unauthorized",
-    });
-};
-
-const dosenPaOnly = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ) => {
-    if ((req as CustomRequest).roles?.includes("dosen-pa")) {
-        return next();
-    }  
-
-    res.status(401).json({
-      response: false,
-      message: "Unauthorized",
-    });
+    next();
+  };
 };
 
 export {
-    mahasiswaOnly,
-    dosenPaOnly
+    authorizeRoles
 }

@@ -1,13 +1,14 @@
 import express from "express";
 import accessTokenValidation from "../middlewares/auth.middlewares";
-import { findMahasiswaByNameOrNim, getInfoMahasiswaPAPerAngkatanByNIP, postSetoran } from "../controllers/dosen.controllers";
-import { dosenPaOnly } from "../middlewares/protected.middlewares";
+import { findMahasiswaByNameOrNim, getInfoDosenByEmail, getInfoMahasiswaPAPerAngkatanByNIP, postSetoran } from "../controllers/dosen.controllers";
+import { authorizeRoles } from "../middlewares/protected.middlewares";
 
 const router = express.Router();
 
-router.get("/dosen/mahasiswa/angkatan/info/:nip", accessTokenValidation, dosenPaOnly, getInfoMahasiswaPAPerAngkatanByNIP);
-router.get("/dosen/mahasiswa", accessTokenValidation, dosenPaOnly, findMahasiswaByNameOrNim);
-router.post("/dosen/mahasiswa", accessTokenValidation, dosenPaOnly, postSetoran);
+router.get("/dosen/info/:email", accessTokenValidation, authorizeRoles("dosen-pa"), getInfoDosenByEmail);
+router.get("/dosen/mahasiswa/angkatan/info/:nip", accessTokenValidation, authorizeRoles("dosen-pa"), getInfoMahasiswaPAPerAngkatanByNIP);
+router.get("/dosen/mahasiswa", accessTokenValidation, authorizeRoles("dosen-pa"), findMahasiswaByNameOrNim);
+router.post("/dosen/mahasiswa", accessTokenValidation, authorizeRoles("dosen-pa"), postSetoran);
 
 export default router;
 
