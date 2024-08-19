@@ -111,6 +111,7 @@ const getSurahMahasiswaByNIM = async (req: any, res: any) => {
 					nim: nim, // Kondisi pada JOIN: SETORAN.NIM = nim
 				},
 				select: {
+					tgl_setoran: true, // SELECT SETORAN.TGL_SETORAN
 					tgl_validasi: true, // SELECT SETORAN.TGL_VALIDASI
 					dosen: {
 						select: {

@@ -32,7 +32,7 @@ const getInfoDosenByEmail = async (req: Request, res: Response) => {
 };
 
 const postSetoran = async (req: Request, res: Response) => {
-	const { nim, nip, nomor_surah } = req.body;
+	const { nim, nip, nomor_surah, tgl_setoran } = req.body;
 
 	// Validasi input
 	if (!nim || !nip || !nomor_surah) {
@@ -78,7 +78,7 @@ const postSetoran = async (req: Request, res: Response) => {
 		const result = await prisma.setoran.create({
 			data: {
 				id: idSetoran,
-				tgl_setoran: new Date(),
+				tgl_setoran: tgl_setoran ? new Date(tgl_setoran) : new Date(),
 				tgl_validasi: new Date(),
 				nim: nim as string,
 				nip: nip as string,
