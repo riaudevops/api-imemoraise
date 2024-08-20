@@ -38,22 +38,21 @@ const postSetoran = async (req: Request, res: Response) => {
 	if (!nim || !nip || !nomor_surah) {
 		return res.status(400).json({
 			response: false,
-			message: "Missing required fields",
+			message: "Waduh, lengkapi dulu datanya mas!",
 		});
 	}
 
-	// Convert nomor_surah to integer if it is a string
+	// Convert nomor_surah to integer if it is a string, and returns err if not
 	const nomorSurahInt = parseInt(nomor_surah as string, 10);
-
 	if (isNaN(nomorSurahInt)) {
 		return res.status(400).json({
 			response: false,
-			message: "Invalid nomor_surah format",
+			message: "Waduh, nomor surahnya salah format mas!",
 		});
 	}
 
 	try {
-		// Periksa apakah kombinasi nim, nip, dan nomor_surah sudah ada
+		// Periksa apakah kombinasi nim, nip, dan nomor_surah sudah ada (antisipasi duplikasi setoran di 1 mhs)
 		const existingSetoran = await prisma.setoran.findFirst({
 			where: {
 				AND: [
@@ -63,19 +62,18 @@ const postSetoran = async (req: Request, res: Response) => {
 				],
 			},
 		});
-
 		if (existingSetoran) {
 			return res.status(409).json({
 				response: false,
-				message: "Combination of nim, nip, and nomor_surah already exists",
+				message: "Maaf, mahasiswa ybs telah menyetor surah tersebut!",
 			});
 		}
 
-		// Generate ID baru
+		// Generate ID setoran baru format SH240001 ++
 		const idSetoran = await IDGenerator.generateNewId();
 
-		// Simpan data ke database
-		const result = await prisma.setoran.create({
+		// Simpan data ke database mas
+		await prisma.setoran.create({
 			data: {
 				id: idSetoran,
 				tgl_setoran: tgl_setoran ? new Date(tgl_setoran) : new Date(),
@@ -89,16 +87,13 @@ const postSetoran = async (req: Request, res: Response) => {
 		// Kirim respons sukses
 		res.status(201).json({
 			response: true,
-			message: "Data terkirim",
-			data: result,
+			message: "Yeay, proses validasi setoran berhasil! ✨",
 		});
+
 	} catch (error) {
-		// Tangani kesalahan
-		console.error("Error executing query:", error);
 		res.status(500).json({
 			response: false,
-			message: "Error posting data",
-			error: "test", // Hanya kirim pesan error untuk keamanan
+			message: "Oops! ada kesalahan di server kami 😭",
 		});
 	}
 };
@@ -108,23 +103,25 @@ const findMahasiswaByNameOrNim = async (req: Request, res: Response) => {
 
 	try {
 		const result = await prisma.$queryRaw`
-    SELECT nim, nama
-    FROM mahasiswa WHERE CONCAT('20', SUBSTRING(nim, 2, 2)) = ${angkatan}
-    AND nip = ${nip}
-    AND (LOWER(nama) LIKE ${`%${search}%`} OR LOWER(nim) LIKE ${`%${search}%`});
-    `;
+			SELECT 
+				nim, nama
+			FROM 
+				mahasiswa 
+			WHERE 
+				CONCAT('20', SUBSTRING(nim, 2, 2)) = ${angkatan}
+				AND nip = ${nip}
+				AND (LOWER(nama) LIKE ${`%${search}%`} OR LOWER(nim) LIKE ${`%${search}%`});
+		`;
 
 		res.status(200).json({
 			response: true,
-			message: "Nama atau Nim mahasiswa",
+			message: "Berikut list data mahasiswa yang sesuai!",
 			data: result,
 		});
 	} catch (error) {
-		console.error("Error executing query:", error);
 		res.status(500).json({
 			response: false,
-			message: "Error retrieving data",
-			error: error,
+			message: "Oops! ada kesalahan di server kami 😭",
 		});
 	}
 };

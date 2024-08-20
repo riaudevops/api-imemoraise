@@ -72,7 +72,7 @@ const getInfoSetoranMahasiswaByNIM = async (req: Request, res: Response) => {
 				END;
 		`;
 
-		const resultWithNumbers = (result as any).map((item: statsInfoSetoranMahasiswaProps) => ({
+		const resultWithNumbers = (result as statsInfoSetoranMahasiswaProps[]).map((item: statsInfoSetoranMahasiswaProps) => ({
 			label: item.label,
 			jumlah_wajib_setor: Number(item.jumlah_wajib_setor),
 			jumlah_sudah_setor: Number(item.jumlah_sudah_setor),
@@ -95,7 +95,7 @@ const getInfoSetoranMahasiswaByNIM = async (req: Request, res: Response) => {
 	}
 };
 
-const getSurahMahasiswaByNIM = async (req: any, res: any) => {
+const getSetoranMahasiswaByNIM = async (req: any, res: any) => {
 	const { nim } = req.params;
 
 	const result = await prisma.surah.findMany({
@@ -108,7 +108,7 @@ const getSurahMahasiswaByNIM = async (req: any, res: any) => {
 			label: true, // SELECT SURAH.LABEL
 			setoran: {
 				where: {
-					nim: nim, // Kondisi pada JOIN: SETORAN.NIM = nim
+					nim: nim, // Kondisi tambahan pada JOIN: ON SETORAN.NIM = nim
 				},
 				select: {
 					tgl_setoran: true, // SELECT SETORAN.TGL_SETORAN
@@ -125,7 +125,7 @@ const getSurahMahasiswaByNIM = async (req: any, res: any) => {
 
 	res.status(200).json({
 		response: true,
-		message: "list surah pov mahasiswa",
+		message: "list data setoran mahasiswa",
 		data: result,
 	});
 };
@@ -133,5 +133,5 @@ const getSurahMahasiswaByNIM = async (req: any, res: any) => {
 export {
 	getInfoMahasiswaByEmail,
 	getInfoSetoranMahasiswaByNIM,
-	getSurahMahasiswaByNIM,
+	getSetoranMahasiswaByNIM,
 };
