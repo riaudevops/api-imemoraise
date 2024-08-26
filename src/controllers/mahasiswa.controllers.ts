@@ -95,7 +95,7 @@ const getInfoSetoranMahasiswaByNIM = async (req: Request, res: Response) => {
 	}
 };
 
-const getSetoranMahasiswaByNIM = async (req: any, res: any) => {
+const getAllSetoranMahasiswaByNIM = async (req: any, res: any) => {
 	const { nim } = req.params;
 
 	const result = await prisma.surah.findMany({
@@ -111,6 +111,7 @@ const getSetoranMahasiswaByNIM = async (req: any, res: any) => {
 					nim: nim, // Kondisi tambahan pada JOIN: ON SETORAN.NIM = nim
 				},
 				select: {
+					id: true, // SELECT SETORAN.ID
 					tgl_setoran: true, // SELECT SETORAN.TGL_SETORAN
 					tgl_validasi: true, // SELECT SETORAN.TGL_VALIDASI
 					dosen: {
@@ -133,5 +134,5 @@ const getSetoranMahasiswaByNIM = async (req: any, res: any) => {
 export {
 	getInfoMahasiswaByEmail,
 	getInfoSetoranMahasiswaByNIM,
-	getSetoranMahasiswaByNIM,
+	getAllSetoranMahasiswaByNIM,
 };
