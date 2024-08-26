@@ -1,5 +1,9 @@
 import { PrismaClient } from "@prisma/client";
-import { getInfoMahasiswaPAPerAngkatanByNIP, IDGenerator } from "../services/dosen.services";
+import {
+	getAllInfoSetoranByNip,
+	getInfoMahasiswaPAPerAngkatanByNIP,
+	IDGenerator,
+} from "../services/dosen.services";
 import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
@@ -17,16 +21,25 @@ const getInfoDosenByEmail = async (req: Request, res: Response) => {
 				nip: true,
 			},
 		});
-		
-		const resultInfoMahasiswaPerAngkatan = await getInfoMahasiswaPAPerAngkatanByNIP(resultInfoPribadiDosen!.nip);
+
+		const resultInfoMahasiswaPerAngkatan =
+			await getInfoMahasiswaPAPerAngkatanByNIP(resultInfoPribadiDosen!.nip);
+
+		const statsSetoran = await getAllInfoSetoranByNip(
+			resultInfoPribadiDosen!.nip
+		);
 
 		res.status(200).json({
 			response: true,
-			message: "Berikut info dosen lengkap serta info mahasiswa per angkatan (max 8 akt)!",
+			message:
+				"Berikut info dosen lengkap serta info mahasiswa per angkatan (max 8 akt)!",
 			data: {
 				nama: resultInfoPribadiDosen!.nama,
 				nip: resultInfoPribadiDosen!.nip,
 				info: resultInfoMahasiswaPerAngkatan,
+				stats: {
+					list_setoran_perhari: statsSetoran,
+				},
 			},
 		});
 	} catch (error) {
@@ -97,7 +110,6 @@ const postSetoran = async (req: Request, res: Response) => {
 				response: true,
 				message: "Yeay, proses validasi setoran berhasil! ✨",
 			});
-
 		} catch (error) {
 			res.status(500).json({
 				response: false,
@@ -105,6 +117,38 @@ const postSetoran = async (req: Request, res: Response) => {
 			});
 		}
 	});
+};
+
+const deleteSetoranByID = async (req: Request, res: Response) => {
+	const { id_setoran } = req.params;
+
+	// Validasi input
+	if (!id_setoran) {
+		return res.status(400).json({
+			response: false,
+			message: "Waduh, id setoran-nya kagak ada mas, apa yang mau diapus!",
+		});
+	}
+
+	try {
+		await prisma.setoran
+			.delete({
+				where: {
+					id: id_setoran,
+				},
+			})
+			.then(() => {
+				return res.status(200).json({
+					response: true,
+					message: "Yeay, data setoran berhasil di-batalkan! ✨",
+				});
+			});
+	} catch (error) {
+		return res.status(500).json({
+			response: false,
+			message: "Oops! ada kesalahan di server kami 😭",
+		});
+	}
 };
 
 const findMahasiswaByNameOrNim = async (req: Request, res: Response) => {
@@ -139,4 +183,5 @@ export {
 	getInfoDosenByEmail,
 	findMahasiswaByNameOrNim,
 	postSetoran,
+	deleteSetoranByID,
 };
