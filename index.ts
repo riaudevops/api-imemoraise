@@ -1,8 +1,8 @@
 import express from "express";
 import cors from "cors";
-import authRoutes from "./src/routes/auth.routes";
-import dosenRoutes from "./src/routes/dosen.routes";
-import mahasiswaRoutes from "./src/routes/mahasiswa.routes";
+import authRoutes from "./src/routes/auth.routes.js";
+import dosenRoutes from "./src/routes/dosen.routes.js";
+import mahasiswaRoutes from "./src/routes/mahasiswa.routes.js";
 
 const app = express();
 const port = 5000;

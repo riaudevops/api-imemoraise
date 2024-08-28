@@ -3,7 +3,7 @@ import {
   getAllInfoSetoranByNip,
   getInfoMahasiswaPAPerAngkatanByNIP,
   IDGenerator,
-} from "../services/dosen.services";
+} from "../services/dosen.services.js";
 import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
