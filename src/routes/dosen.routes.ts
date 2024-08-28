@@ -1,12 +1,12 @@
 import express from "express";
-import accessTokenValidation from "../middlewares/auth.middlewares";
+import accessTokenValidation from "../middlewares/auth.middlewares.js";
 import {
   deleteSetoranByID,
   findMahasiswaByNameOrNim,
   getInfoDosenByEmail,
   postSetoran,
-} from "../controllers/dosen.controllers";
-import { authorizeRoles } from "../middlewares/protected.middlewares";
+} from "../controllers/dosen.controllers.js";
+import { authorizeRoles } from "../middlewares/protected.middlewares.js";
 
 const router = express.Router();
 

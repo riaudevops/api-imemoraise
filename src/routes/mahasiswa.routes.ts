@@ -1,11 +1,11 @@
 import express from "express";
-import accessTokenValidation from "../middlewares/auth.middlewares";
+import accessTokenValidation from "../middlewares/auth.middlewares.js";
 import {
   getInfoMahasiswaByEmail,
   getInfoSetoranMahasiswaByNIM,
   getAllSetoranMahasiswaByNIM,
-} from "../controllers/mahasiswa.controllers";
-import { authorizeRoles } from "../middlewares/protected.middlewares";
+} from "../controllers/mahasiswa.controllers.js";
+import { authorizeRoles } from "../middlewares/protected.middlewares.js";
 
 const router = express.Router();
 
